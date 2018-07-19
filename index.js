@@ -59,6 +59,7 @@ const scrapHamroPatro = function scrapHamroPatro(page) {
           event: item.querySelector('span.event').innerText,
           day: item.querySelector('span.nep').innerText,
           dayInEn: nepToEngNum(item.querySelector('span.nep').innerText),
+          en: item.querySelector('span.eng').innerText,
         }));
       return days;
     }, bodyHandle);
