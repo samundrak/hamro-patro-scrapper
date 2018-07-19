@@ -6,8 +6,8 @@ const writeFileAsync = promisify(fs.writeFile); // (A)
 
 const SAVE_FILE_FOR_EACH_YEAR = true;
 
-const RECORDS_OF_YEAR = [2074];
-for (let y = 2074; y <= 2076; y++) {
+const RECORDS_OF_YEAR = [];
+for (let y = 2000; y <= 2076; y++) {
   RECORDS_OF_YEAR.push(y);
 }
 const MONTHS = (() =>
@@ -55,11 +55,13 @@ const scrapHamroPatro = function scrapHamroPatro(page) {
         .filter((item) => ![...item.classList].includes('disable'))
         // no optimization, if u need u can do
         .map((item) => ({
-          tithi: item.querySelector('span.tithi').innerText,
-          event: item.querySelector('span.event').innerText,
-          day: item.querySelector('span.nep').innerText,
-          dayInEn: nepToEngNum(item.querySelector('span.nep').innerText),
-          en: item.querySelector('span.eng').innerText,
+          tithi: (item.querySelector('span.tithi') || {}).innerText,
+          event: (item.querySelector('span.event') || {}).innerText,
+          day: (item.querySelector('span.nep') || {}).innerText,
+          dayInEn: nepToEngNum(
+            (item.querySelector('span.nep') || {}).innerText
+          ),
+          en: (item.querySelector('span.eng') || {}).innerText,
         }));
       return days;
     }, bodyHandle);
