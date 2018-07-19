@@ -2,6 +2,10 @@
 
 Scraps days,events, tithi from (HamroPatro.com) from any given year to any give months
 
+### Nepali Tithi
+
+nepali calendar api conisiting of both AD and BS dates with 'tithi' and other Nepal specific info. goto `data` folder for already downloaded records
+
 ## Usage
 
 - Clone this repo
