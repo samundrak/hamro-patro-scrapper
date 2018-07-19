@@ -4,14 +4,17 @@ const { promisify } = require('util');
 const fs = require('fs');
 const writeFileAsync = promisify(fs.writeFile); // (A)
 
-const data = {};
-const getHost = (year, month) =>
-  `https://www.hamropatro.com/calendar/${year}/${month}/`;
-const recordsOfYears = [2075];
-const months = (() =>
+const SAVE_FILE_FOR_EACH_YEAR = true;
+
+const RECORDS_OF_YEAR = [2075];
+const MONTHS = (() =>
   Array(12)
     .fill(true)
     .map((item, index) => index + 1))();
+
+const data = {};
+const getHost = (year, month) =>
+  `https://www.hamropatro.com/calendar/${year}/${month}/`;
 
 const scrapHamroPatro = function scrapHamroPatro(page) {
   return async function*(host) {
@@ -39,19 +42,27 @@ const scrapHamroPatro = function scrapHamroPatro(page) {
   const page = await browser.newPage();
   const scrap = scrapHamroPatro(page);
   try {
-    for await (const year of recordsOfYears) {
+    for await (const year of RECORDS_OF_YEAR) {
       data[year] = [];
-      for await (const month of months) {
+      for await (const month of MONTHS) {
         const monthIndex = data[year].push({ month });
         for await (const days of scrap(getHost(year, month))) {
           data[year][monthIndex - 1].days = days;
         }
       }
+      if (SAVE_FILE_FOR_EACH_YEAR) {
+        await writeFileAsync(
+          `data/years/${year}.json`,
+          JSON.stringify(data[year])
+        );
+      }
     }
   } catch (e) {
     console.error(e);
   }
-  await writeFileAsync('data.json', JSON.stringify(data));
+  if (!SAVE_FILE_FOR_EACH_YEAR) {
+    await writeFileAsync('data/data.json', JSON.stringify(data));
+  }
   console.log('Finished...');
   await browser.close();
 })();
