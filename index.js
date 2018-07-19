@@ -1,15 +1,15 @@
 const puppeteer = require('puppeteer');
 const { promisify } = require('util');
-
 const fs = require('fs');
+
 const writeFileAsync = promisify(fs.writeFile); // (A)
 
 const SAVE_FILE_FOR_EACH_YEAR = true;
 
-const RECORDS_OF_YEAR = [];
-for (let y = 2000; y <= 2076; y++) {
-  RECORDS_OF_YEAR.push(y);
-}
+const RECORDS_OF_YEAR = [2074];
+// for (let y = 2000; y <= 2076; y++) {
+//   RECORDS_OF_YEAR.push(y);
+// }
 const MONTHS = (() =>
   Array(12)
     .fill(true)
@@ -25,14 +25,40 @@ const scrapHamroPatro = function scrapHamroPatro(page) {
     await page.goto(host);
     const bodyHandle = await page.$('body');
     const body = await page.evaluate((body) => {
+      const tableOfNepEngNums = new Map([
+        ['०', 0],
+        ['१', 1],
+        ['२', 2],
+        ['३', 3],
+        ['४', 4],
+        ['५', 5],
+        ['६', 6],
+        ['७', 7],
+        ['८', 8],
+        ['९', 9],
+      ]);
+
+      function nepToEngNum(strNum) {
+        return String(strNum)
+          .split('')
+          .map(function(ch) {
+            if (ch === '.' || ch === ',') {
+              return ch;
+            }
+            return tableOfNepEngNums.get(ch);
+          })
+          .join('');
+      }
       const days = Array.from(
         body.querySelectorAll('.calendar .dates li:not(disable)')
       )
         .filter((item) => ![...item.classList].includes('disable'))
+        // no optimization, if u need u can do
         .map((item) => ({
           tithi: item.querySelector('span.tithi').innerText,
           event: item.querySelector('span.event').innerText,
           day: item.querySelector('span.nep').innerText,
+          dayInEn: nepToEngNum(item.querySelector('span.nep').innerText),
         }));
       return days;
     }, bodyHandle);
