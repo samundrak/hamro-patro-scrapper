@@ -7,7 +7,7 @@ const writeFileAsync = promisify(fs.writeFile); // (A)
 const SAVE_FILE_FOR_EACH_YEAR = true;
 
 const RECORDS_OF_YEAR = [];
-for (let y = 2070; y <= 2075; y++) {
+for (let y = 2076; y <= 2076; y++) {
   RECORDS_OF_YEAR.push(y);
 }
 const MONTHS = (() =>
@@ -24,7 +24,7 @@ const scrapHamroPatro = function scrapHamroPatro(page) {
     console.log(`Fetching ${host}`);
     await page.goto(host);
     const bodyHandle = await page.$('body');
-    const body = await page.evaluate((body) => {
+    const body = await page.evaluate(body => {
       const tableOfNepEngNums = new Map([
         ['०', 0],
         ['१', 1],
@@ -50,17 +50,17 @@ const scrapHamroPatro = function scrapHamroPatro(page) {
           .join('');
       }
       const days = Array.from(
-        body.querySelectorAll('.calendar .dates li:not(disable)')
+        body.querySelectorAll('.calendar .dates li:not(disable)'),
       )
-        .filter((item) => ![...item.classList].includes('disable'))
+        .filter(item => ![...item.classList].includes('disable'))
         // no optimization, if u need u can do
-        .map((item) => ({
+        .map(item => ({
           isHoliday: [...item.classList].includes('holiday'),
           tithi: (item.querySelector('span.tithi') || {}).innerText,
           event: (item.querySelector('span.event') || {}).innerText,
           day: (item.querySelector('span.nep') || {}).innerText,
           dayInEn: nepToEngNum(
-            (item.querySelector('span.nep') || {}).innerText
+            (item.querySelector('span.nep') || {}).innerText,
           ),
           en: (item.querySelector('span.eng') || {}).innerText,
         }));
@@ -86,7 +86,7 @@ const scrapHamroPatro = function scrapHamroPatro(page) {
       if (SAVE_FILE_FOR_EACH_YEAR) {
         await writeFileAsync(
           `data/years/${year}.json`,
-          JSON.stringify(data[year])
+          JSON.stringify(data[year]),
         );
       }
     }
